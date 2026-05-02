@@ -51,15 +51,27 @@
     </main>
 
     <footer class="footer">
-      <a href="https://logic-moon.de" target="_blank" rel="noopener">logic-moon.de</a>
-      <span class="sep">·</span>
-      <a href="https://the-moon-records.de" target="_blank" rel="noopener">the-moon-records.de</a>
+      <div class="footer-row">
+        <span>Built by <a href="https://tobeworks.de" target="_blank" rel="noopener">tobeworks.de</a></span>
+        <span class="sep">·</span>
+        <a href="https://logic-moon.de" target="_blank" rel="noopener">logic-moon.de</a>
+        <span class="sep">·</span>
+        <a href="https://the-moon-records.de" target="_blank" rel="noopener">the-moon-records.de</a>
+      </div>
+      <div class="footer-row footer-legal">
+        <a href="https://tobeworks.de/impressum" target="_blank" rel="noopener">Impressum</a>
+        <span class="sep">·</span>
+        <a href="https://tobeworks.de/datenschutz" target="_blank" rel="noopener">Datenschutz</a>
+        <span class="sep">·</span>
+        <span>v{{ version }}</span>
+      </div>
     </footer>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { version } from '../package.json'
 import ArtistInput from './components/ArtistInput.vue'
 import LayoutPicker from './components/LayoutPicker.vue'
 import CollageCanvas from './components/CollageCanvas.vue'
@@ -262,13 +274,33 @@ body {
 }
 
 .footer {
-  padding: 20px 24px;
+  padding: 16px 24px;
   text-align: center;
   font-family: 'Space Mono', monospace;
   font-size: 12px;
   color: rgba(34,34,34,0.4);
   border-top: 1px solid rgba(34,34,34,0.1);
   margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+.footer-legal {
+  font-size: 11px;
+  color: rgba(34,34,34,0.3);
+}
+
+.footer-legal a {
+  color: rgba(34,34,34,0.35);
 }
 
 .footer a {
