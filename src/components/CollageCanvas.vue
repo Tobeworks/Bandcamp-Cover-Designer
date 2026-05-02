@@ -22,7 +22,7 @@
 
     <!-- Branding overlay — mirrors canvas export -->
     <div v-if="showBranding && artistName" class="branding-bar" aria-hidden="true">
-      <span class="branding-name">{{ artistName.toUpperCase() }}</span>
+      <span class="branding-name">{{ artistName.toLowerCase() }}.bandcamp.com</span>
     </div>
 
     <canvas ref="canvasRef" class="hidden-canvas" :width="canvasW" :height="canvasH" />
@@ -153,7 +153,7 @@ async function renderToCanvas(): Promise<Blob> {
     ctx.font = 'bold 18px "Space Mono", monospace'
     ctx.letterSpacing = '3px'
     ctx.textAlign = 'right'
-    ctx.fillText(props.artistName.toUpperCase(), W - 20, H - 18)
+    ctx.fillText(`${props.artistName.toLowerCase()}.bandcamp.com`, W - 20, H - 18)
   }
 
   return new Promise(resolve => canvas.toBlob(blob => resolve(blob!), 'image/png'))
