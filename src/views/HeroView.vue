@@ -110,9 +110,4 @@ function handleSubmit() {
   router.push({ path: '/app', query: { artist } })
 }
 
-const mockupColors = [
-  '#596b47', '#6b4760', '#476b5f',
-  '#61654e', '#6b4747', '#4a5e6b',
-  '#6b5f47', '#47476b', '#5e6b47',
-]
 </script>
