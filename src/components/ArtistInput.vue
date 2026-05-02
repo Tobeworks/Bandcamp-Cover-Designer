@@ -23,7 +23,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const props = defineProps<{ loading: boolean }>()
+const { loading } = defineProps<{ loading: boolean }>()
 const emit = defineEmits<{ submit: [artist: string] }>()
 
 const value = ref('')
