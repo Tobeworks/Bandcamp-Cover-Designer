@@ -30,7 +30,7 @@
 
       <div v-if="!albums.length && !loading && !error" class="empty">
         <p>Enter a Bandcamp artist name and click <strong>Load</strong>.</p>
-        <p class="hint">Examples: <code>logikmoon</code> · <code>ninjatune</code> · <code>brainfeeder</code></p>
+        <p class="hint">Examples: <code>logicmoon</code> · <code>ninjatune</code> · <code>brainfeeder</code></p>
       </div>
 
       <div v-if="loading" class="loading">
