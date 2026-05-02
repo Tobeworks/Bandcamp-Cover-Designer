@@ -1,11 +1,16 @@
 <template>
-  <div class="layout-picker">
+  <div class="flex gap-1 flex-wrap" role="group" aria-label="Layout options">
     <button
       v-for="layout in availableLayouts"
       :key="layout.mode"
-      :class="['btn', { active: modelValue === layout.mode }]"
-      @click="emit('update:modelValue', layout.mode)"
+      class="px-3 py-1.5 border rounded-sm text-xs font-mono cursor-pointer transition-all"
+      :class="modelValue === layout.mode
+        ? 'bg-[#0cacd7] border-[#0cacd7] text-white'
+        : 'bg-transparent border-[#22222230] text-[#222] hover:border-[#0cacd7] hover:text-[#0cacd7]'"
+      :aria-pressed="modelValue === layout.mode"
+      :aria-label="`${layout.label} layout`"
       :data-testid="`layout-${layout.mode}`"
+      @click="emit('update:modelValue', layout.mode)"
     >
       {{ layout.label }}
     </button>
@@ -24,34 +29,3 @@ const availableLayouts = computed(() =>
   LAYOUTS.filter(l => l.mode === 'mosaic' || l.count <= props.albumCount)
 )
 </script>
-
-<style scoped>
-.layout-picker {
-  display: flex;
-  gap: 4px;
-}
-
-.btn {
-  padding: 6px 14px;
-  background: transparent;
-  color: #222;
-  border: 1px solid rgba(34, 34, 34, 0.3);
-  border-radius: 2px;
-  font-size: 12px;
-  font-family: 'Space Mono', monospace;
-  cursor: pointer;
-  transition: all 0.15s;
-  letter-spacing: 0.03em;
-}
-
-.btn:hover {
-  border-color: #0cacd7;
-  color: #0cacd7;
-}
-
-.btn.active {
-  background: #0cacd7;
-  border-color: #0cacd7;
-  color: #fff;
-}
-</style>

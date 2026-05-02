@@ -1,6 +1,12 @@
 <template>
-  <button class="btn" :disabled="disabled || downloading" @click="handleDownload" data-testid="download-btn">
-    <span v-if="downloading" class="spinner" />
+  <button
+    class="flex items-center gap-2 px-4 py-1.5 bg-[#222] text-white border border-white/10 rounded-sm text-xs font-mono tracking-wide cursor-pointer transition-colors hover:bg-[#333] disabled:opacity-40 disabled:cursor-not-allowed"
+    :disabled="disabled || downloading"
+    :aria-label="downloading ? 'Generating PNG…' : 'Download 1080×1080 PNG'"
+    data-testid="download-btn"
+    @click="handleDownload"
+  >
+    <span v-if="downloading" class="inline-block w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin-smooth" aria-hidden="true" />
     <span v-else>↓ PNG (1080×1080)</span>
   </button>
 </template>
@@ -31,44 +37,3 @@ async function handleDownload() {
   }
 }
 </script>
-
-<style scoped>
-.btn {
-  padding: 8px 20px;
-  background: #222;
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 3px;
-  font-size: 13px;
-  font-family: 'Space Mono', monospace;
-  cursor: pointer;
-  transition: background 0.15s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  letter-spacing: 0.04em;
-}
-
-.btn:hover:not(:disabled) {
-  background: #333;
-}
-
-.btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.spinner {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-</style>

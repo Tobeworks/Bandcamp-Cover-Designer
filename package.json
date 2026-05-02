@@ -10,7 +10,9 @@
     "test": "playwright test"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.2.4",
     "node-html-parser": "^6.1.0",
+    "tailwindcss": "^4.2.4",
     "vue": "^3.4.0"
   },
   "devDependencies": {

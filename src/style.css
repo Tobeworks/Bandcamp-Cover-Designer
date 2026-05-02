@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bc: #0cacd7;
+  --color-bc-dark: #0a9bbf;
+  --color-surface: #ecf3f4;
+  --color-ink: #222222;
+  --color-muted: #5d5d5d;
+  --font-mono: 'Space Mono', monospace;
+}
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid var(--color-bc);
+  outline-offset: 2px;
+}
+
+/* Skip link */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 9999;
+  background: var(--color-bc);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 0 0 4px 4px;
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* Spinner animation */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.animate-spin-smooth {
+  animation: spin 0.7s linear infinite;
+}
