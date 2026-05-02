@@ -11,8 +11,8 @@ export function useBandcamp() {
   function clampLayout(current: LayoutMode, count: number): LayoutMode {
     const available = LAYOUTS.filter(l => l.mode === 'mosaic' || l.count <= count)
     if (available.find(l => l.mode === current)) return current
-    const last = available.filter(l => l.mode !== 'mosaic').at(-1)
-    return last?.mode ?? '1x1'
+    const nonMosaic = available.filter(l => l.mode !== 'mosaic')
+    return nonMosaic[nonMosaic.length - 1]?.mode ?? '1x1'
   }
 
   async function fetchAlbums(artist: string, currentLayout?: LayoutMode): Promise<LayoutMode | null> {
@@ -27,7 +27,7 @@ export function useBandcamp() {
 
       if (!res.ok) {
         error.value = data.error ?? 'Fehler beim Laden der Alben.'
-        return
+        return null
       }
 
       if (!data.albums?.length) {
