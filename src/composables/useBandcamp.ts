@@ -1,5 +1,6 @@
 import { ref } from 'vue'
-import type { Album } from '../types'
+import type { Album, LayoutMode } from '../types'
+import { LAYOUTS } from '../types'
 
 export function useBandcamp() {
   const albums = ref<Album[]>([])
@@ -7,7 +8,14 @@ export function useBandcamp() {
   const error = ref<string | null>(null)
   const artistName = ref('')
 
-  async function fetchAlbums(artist: string) {
+  function clampLayout(current: LayoutMode, count: number): LayoutMode {
+    const available = LAYOUTS.filter(l => l.mode === 'mosaic' || l.count <= count)
+    if (available.find(l => l.mode === current)) return current
+    const last = available.filter(l => l.mode !== 'mosaic').at(-1)
+    return last?.mode ?? '1x1'
+  }
+
+  async function fetchAlbums(artist: string, currentLayout?: LayoutMode): Promise<LayoutMode | null> {
     loading.value = true
     error.value = null
     albums.value = []
@@ -24,12 +32,14 @@ export function useBandcamp() {
 
       if (!data.albums?.length) {
         error.value = `No releases found for "${artist}".`
-        return
+        return null
       }
 
       albums.value = data.albums
+      return currentLayout ? clampLayout(currentLayout, data.albums.length) : null
     } catch {
       error.value = 'Network error. Is the dev server running?'
+      return null
     } finally {
       loading.value = false
     }

@@ -59,39 +59,43 @@ function bandcampPlugin(): Plugin {
           const html = await response.text()
           const root = parse(html)
 
-          // Try data-client-items attribute (Bandcamp's embedded JSON)
-          const musicGrid = root.querySelector('[data-client-items]')
-          let albums: Album[] = []
+          // Extract band_id from data-band attribute
+          const bandEl = root.querySelector('[data-band]')
+          const bandData = JSON.parse(bandEl?.getAttribute('data-band') ?? '{}')
+          const bandId: string = String(bandData.id ?? '')
 
-          if (musicGrid) {
-            try {
-              const items = JSON.parse(musicGrid.getAttribute('data-client-items') ?? '[]')
-              albums = items
-                .filter((item: BandcampItem) => item.item_type === 'album' || item.item_type === 'track')
-                .map((item: BandcampItem) => ({
-                  id: String(item.id ?? item.page_url),
-                  title: item.title ?? 'Unknown',
-                  imageUrl: item.art_id
-                    ? `https://f4.bcbits.com/img/a${item.art_id}_10.jpg`
-                    : null,
-                  releaseDate: item.publish_date ?? null,
-                  url: item.page_url ? `https://${artist}.bandcamp.com${item.page_url}` : null,
-                }))
-                .filter((a: Album) => a.imageUrl)
-            } catch {
-              // fall through to DOM parsing
+          const albums: Album[] = []
+
+          if (bandId) {
+            // Use Bandcamp mobile API — returns full discography, newest first
+            const apiUrl = `https://${encodeURIComponent(artist)}.bandcamp.com/api/mobile/22/band_details?band_id=${bandId}`
+            const apiRes = await fetch(apiUrl, {
+              headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
+            })
+            if (apiRes.ok) {
+              const apiData = await apiRes.json() as { discography?: BandcampItem[] }
+              for (const item of apiData.discography ?? []) {
+                if (item.art_id) {
+                  albums.push({
+                    id: String(item.id ?? albums.length),
+                    title: item.title ?? 'Unknown',
+                    imageUrl: `https://f4.bcbits.com/img/a${item.art_id}_10.jpg`,
+                    releaseDate: null,
+                    url: item.url ?? null,
+                  })
+                }
+              }
             }
           }
 
-          // Fallback: parse music grid items from DOM
+          // Fallback: parse ol.music-grid from DOM
           if (albums.length === 0) {
-            const items = root.querySelectorAll('li.music-grid-item, li[data-item-id]')
+            const items = root.querySelectorAll('ol.music-grid li, li.music-grid-item')
             for (const item of items) {
               const img = item.querySelector('img')
-              const titleEl = item.querySelector('.title, p.title, .grid-title')
+              const titleEl = item.querySelector('p.title, .title')
               const link = item.querySelector('a')
-              const src = img?.getAttribute('data-src') ?? img?.getAttribute('src') ?? ''
-              // Upgrade to high-res: replace _6 or _7 suffix with _10
+              const src = img?.getAttribute('data-original') ?? img?.getAttribute('data-src') ?? img?.getAttribute('src') ?? ''
               const imageUrl = src.replace(/_\d+\.jpg$/, '_10.jpg')
               if (imageUrl && imageUrl.includes('bcbits.com')) {
                 albums.push({
@@ -100,24 +104,6 @@ function bandcampPlugin(): Plugin {
                   imageUrl,
                   releaseDate: null,
                   url: link?.getAttribute('href') ?? null,
-                })
-              }
-            }
-          }
-
-          // Last resort: find all bcbits img tags
-          if (albums.length === 0) {
-            const imgs = root.querySelectorAll('img[src*="bcbits.com"], img[data-src*="bcbits.com"]')
-            for (const img of imgs) {
-              const src = img.getAttribute('data-src') ?? img.getAttribute('src') ?? ''
-              const imageUrl = src.replace(/_\d+\.jpg$/, '_10.jpg')
-              if (imageUrl) {
-                albums.push({
-                  id: String(albums.length),
-                  title: img.getAttribute('alt') ?? 'Unknown',
-                  imageUrl,
-                  releaseDate: null,
-                  url: null,
                 })
               }
             }
@@ -138,18 +124,16 @@ function bandcampPlugin(): Plugin {
 interface Album {
   id: string
   title: string
-  imageUrl: string | null
+  imageUrl: string
   releaseDate: string | null
   url: string | null
 }
 
 interface BandcampItem {
   id?: number
-  item_type?: string
   title?: string
   art_id?: number
-  publish_date?: string
-  page_url?: string
+  url?: string
 }
 
 export default defineConfig({

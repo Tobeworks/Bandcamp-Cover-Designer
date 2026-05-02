@@ -20,7 +20,7 @@
       </div>
     </div>
 
-    <canvas ref="canvasRef" class="hidden-canvas" :width="CANVAS_SIZE" :height="CANVAS_SIZE" />
+    <canvas ref="canvasRef" class="hidden-canvas" :width="canvasW" :height="canvasH" />
   </div>
 </template>
 
@@ -40,11 +40,24 @@ const canvasRef = ref<HTMLCanvasElement | null>(null)
 const CANVAS_SIZE = 1080
 const GAP = 3
 
+const canvasW = computed(() => CANVAS_SIZE)
+const canvasH = computed(() => {
+  if (props.layout === 'mosaic') return CANVAS_SIZE
+  const { cols, rows } = currentLayout.value
+  return Math.round(CANVAS_SIZE * rows / cols)
+})
+
 const currentLayout = computed(() => LAYOUTS.find(l => l.mode === props.layout)!)
 
 const visibleAlbums = computed(() => {
   const count = currentLayout.value.count
-  return props.albums.slice(0, count)
+  if (!props.albums.length) return []
+  // Loop albums if fewer than needed
+  const result: Album[] = []
+  for (let i = 0; i < count; i++) {
+    result.push(props.albums[i % props.albums.length])
+  }
+  return result
 })
 
 const gridStyle = computed(() => {
@@ -75,8 +88,10 @@ function onImgError(event: Event, album: Album) {
 async function renderToCanvas(): Promise<Blob> {
   const canvas = canvasRef.value!
   const ctx = canvas.getContext('2d')!
+  const W = canvasW.value
+  const H = canvasH.value
   ctx.fillStyle = '#0a0a0f'
-  ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
+  ctx.fillRect(0, 0, W, H)
 
   const albums = visibleAlbums.value
   const gap = GAP
@@ -99,48 +114,41 @@ async function renderToCanvas(): Promise<Blob> {
   const images = await Promise.allSettled(albums.map(a => loadImage(a.imageUrl)))
 
   if (props.layout === 'mosaic') {
-    // Large first cover: left half
-    const largeW = Math.floor((CANVAS_SIZE - gap) * 2 / 3)
-    const largeH = CANVAS_SIZE
-    const smallW = CANVAS_SIZE - largeW - gap
-    const smallH = Math.floor((CANVAS_SIZE - gap * 3) / 4)
-
+    const largeW = Math.floor((W - gap) * 2 / 3)
+    const smallW = W - largeW - gap
+    const smallH = Math.floor((H - gap * 3) / 4)
     if (images[0]?.status === 'fulfilled') {
-      drawCover(ctx, images[0].value, 0, 0, largeW, largeH)
+      drawCover(ctx, images[0].value, 0, 0, largeW, H)
     }
     for (let i = 1; i < Math.min(albums.length, 5); i++) {
       const img = images[i]
       if (img?.status === 'fulfilled') {
-        const row = i - 1
-        drawCover(ctx, img.value, largeW + gap, row * (smallH + gap), smallW, smallH)
+        drawCover(ctx, img.value, largeW + gap, (i - 1) * (smallH + gap), smallW, smallH)
       }
     }
   } else {
     const cols = currentLayout.value.cols
     const rows = currentLayout.value.rows
-    const cellW = Math.floor((CANVAS_SIZE - gap * (cols - 1)) / cols)
-    const cellH = Math.floor((CANVAS_SIZE - gap * (rows - 1)) / rows)
-
+    const cellW = Math.floor((W - gap * (cols - 1)) / cols)
+    const cellH = Math.floor((H - gap * (rows - 1)) / rows)
     albums.forEach((_, i) => {
       const img = images[i]
       if (img?.status !== 'fulfilled') return
       const col = i % cols
       const row = Math.floor(i / cols)
-      const x = col * (cellW + gap)
-      const y = row * (cellH + gap)
-      drawCover(ctx, img.value, x, y, cellW, cellH)
+      drawCover(ctx, img.value, col * (cellW + gap), row * (cellH + gap), cellW, cellH)
     })
   }
 
   // Branding overlay
   if (props.showBranding && props.artistName) {
     ctx.fillStyle = 'rgba(0,0,0,0.55)'
-    ctx.fillRect(0, CANVAS_SIZE - 52, CANVAS_SIZE, 52)
+    ctx.fillRect(0, H - 52, W, 52)
     ctx.fillStyle = '#fff'
     ctx.font = 'bold 18px "Space Mono", monospace'
     ctx.letterSpacing = '3px'
     ctx.textAlign = 'right'
-    ctx.fillText(props.artistName.toUpperCase(), CANVAS_SIZE - 20, CANVAS_SIZE - 18)
+    ctx.fillText(props.artistName.toUpperCase(), W - 20, H - 18)
   }
 
   return new Promise(resolve => canvas.toBlob(blob => resolve(blob!), 'image/png'))
@@ -168,7 +176,7 @@ defineExpose({ renderToCanvas })
   position: relative;
   width: 100%;
   max-width: 540px;
-  aspect-ratio: 1;
+  aspect-ratio: v-bind('`${canvasW} / ${canvasH}`');
 }
 
 .collage {

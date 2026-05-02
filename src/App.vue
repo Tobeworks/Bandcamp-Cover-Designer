@@ -9,10 +9,10 @@
 
     <main class="main">
       <div class="controls">
-        <ArtistInput :loading="loading" @submit="fetchAlbums" />
+        <ArtistInput :loading="loading" @submit="handleSubmit" />
 
         <div v-if="albums.length" class="controls-row">
-          <LayoutPicker v-model="layout" />
+          <LayoutPicker v-model="layout" :albumCount="albums.length" />
           <button class="btn-ghost" @click="shuffle" title="Randomize order">⇄ Shuffle</button>
           <label class="toggle">
             <input type="checkbox" v-model="showBranding" />
@@ -49,6 +49,12 @@
         <p class="count-hint">{{ albums.length }} releases found · showing {{ currentLayout.count }}</p>
       </div>
     </main>
+
+    <footer class="footer">
+      <a href="https://logic-moon.de" target="_blank" rel="noopener">logic-moon.de</a>
+      <span class="sep">·</span>
+      <a href="https://the-moon-records.de" target="_blank" rel="noopener">the-moon-records.de</a>
+    </footer>
   </div>
 </template>
 
@@ -63,6 +69,11 @@ import { LAYOUTS } from './types'
 import type { LayoutMode } from './types'
 
 const { albums, loading, error, artistName, fetchAlbums, shuffle } = useBandcamp()
+
+async function handleSubmit(artist: string) {
+  const clamped = await fetchAlbums(artist, layout.value)
+  if (clamped) layout.value = clamped
+}
 const layout = ref<LayoutMode>('3x3')
 const showBranding = ref(true)
 const collageRef = ref<InstanceType<typeof CollageCanvas> | null>(null)
@@ -98,7 +109,7 @@ body {
   height: 53px;
   display: flex;
   align-items: center;
-  border-bottom: 2px solid #008000;
+  border-bottom: 2px solid #0cacd7;
 }
 
 .logo {
@@ -108,7 +119,7 @@ body {
 }
 
 .logo-bc {
-  background: #008000;
+  background: #0cacd7;
   color: #fff;
   font-family: 'Space Mono', monospace;
   font-weight: 700;
@@ -177,7 +188,7 @@ body {
 }
 
 .toggle input {
-  accent-color: #008000;
+  accent-color: #0cacd7;
   width: 14px;
   height: 14px;
   cursor: pointer;
@@ -200,7 +211,7 @@ body {
 }
 
 .empty p { font-size: 15px; line-height: 1.6; }
-.empty strong { color: #008000; }
+.empty strong { color: #0cacd7; }
 
 .hint {
   margin-top: 8px;
@@ -229,7 +240,7 @@ body {
   width: 32px;
   height: 32px;
   border: 3px solid rgba(34,34,34,0.1);
-  border-top-color: #008000;
+  border-top-color: #0cacd7;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -248,5 +259,29 @@ body {
   color: rgba(34,34,34,0.45);
   font-family: 'Space Mono', monospace;
   letter-spacing: 0.04em;
+}
+
+.footer {
+  padding: 20px 24px;
+  text-align: center;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: rgba(34,34,34,0.4);
+  border-top: 1px solid rgba(34,34,34,0.1);
+  margin-top: auto;
+}
+
+.footer a {
+  color: rgba(34,34,34,0.5);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.footer a:hover {
+  color: #0cacd7;
+}
+
+.sep {
+  margin: 0 8px;
 }
 </style>

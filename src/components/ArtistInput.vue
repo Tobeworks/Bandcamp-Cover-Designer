@@ -1,7 +1,6 @@
 <template>
   <form class="artist-input" @submit.prevent="handleSubmit">
     <div class="input-wrap">
-      <span class="prefix">bandcamp.com/</span>
       <input
         v-model="value"
         type="text"
@@ -12,6 +11,7 @@
         class="input"
         data-testid="artist-input"
       />
+      <span class="suffix">.bandcamp.com</span>
     </div>
     <button type="submit" :disabled="loading || !value.trim()" class="btn" data-testid="load-btn">
       <span v-if="loading" class="spinner" />
@@ -28,8 +28,21 @@ const emit = defineEmits<{ submit: [artist: string] }>()
 
 const value = ref('')
 
+function parseArtist(input: string): string {
+  let s = input.trim()
+  // Strip protocol
+  s = s.replace(/^https?:\/\//i, '')
+  // Strip trailing slashes/paths
+  s = s.split('/')[0]
+  // Extract subdomain from logicmoon.bandcamp.com
+  if (s.toLowerCase().includes('.bandcamp.com')) {
+    s = s.split('.bandcamp.com')[0]
+  }
+  return s.toLowerCase()
+}
+
 function handleSubmit() {
-  const artist = value.value.trim()
+  const artist = parseArtist(value.value)
   if (artist) emit('submit', artist)
 }
 </script>
@@ -52,18 +65,9 @@ function handleSubmit() {
   max-width: 420px;
 }
 
-.prefix {
-  padding: 8px 6px 8px 12px;
-  font-size: 13px;
-  color: rgba(34, 34, 34, 0.5);
-  font-family: 'Space Mono', monospace;
-  white-space: nowrap;
-  user-select: none;
-}
-
 .input {
   flex: 1;
-  padding: 8px 12px 8px 0;
+  padding: 8px 6px 8px 12px;
   background: transparent;
   border: none;
   outline: none;
@@ -71,6 +75,15 @@ function handleSubmit() {
   font-family: 'Space Mono', monospace;
   color: #222;
   min-width: 0;
+}
+
+.suffix {
+  padding: 8px 12px 8px 0;
+  font-size: 13px;
+  color: rgba(34, 34, 34, 0.5);
+  font-family: 'Space Mono', monospace;
+  white-space: nowrap;
+  user-select: none;
 }
 
 .input::placeholder {
@@ -83,7 +96,7 @@ function handleSubmit() {
 
 .btn {
   padding: 8px 20px;
-  background: #008000;
+  background: #0cacd7;
   color: #fff;
   border: none;
   border-radius: 3px;
@@ -100,7 +113,7 @@ function handleSubmit() {
 }
 
 .btn:hover:not(:disabled) {
-  background: #006600;
+  background: #0a9bbf;
 }
 
 .btn:disabled {

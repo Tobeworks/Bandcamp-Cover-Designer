@@ -1,7 +1,7 @@
 <template>
   <div class="layout-picker">
     <button
-      v-for="layout in LAYOUTS"
+      v-for="layout in availableLayouts"
       :key="layout.mode"
       :class="['btn', { active: modelValue === layout.mode }]"
       @click="emit('update:modelValue', layout.mode)"
@@ -13,11 +13,16 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { LAYOUTS } from '../types'
 import type { LayoutMode } from '../types'
 
-defineProps<{ modelValue: LayoutMode }>()
+const props = defineProps<{ modelValue: LayoutMode; albumCount: number }>()
 const emit = defineEmits<{ 'update:modelValue': [mode: LayoutMode] }>()
+
+const availableLayouts = computed(() =>
+  LAYOUTS.filter(l => l.mode === 'mosaic' || l.count <= props.albumCount)
+)
 </script>
 
 <style scoped>
@@ -40,13 +45,13 @@ const emit = defineEmits<{ 'update:modelValue': [mode: LayoutMode] }>()
 }
 
 .btn:hover {
-  border-color: #008000;
-  color: #008000;
+  border-color: #0cacd7;
+  color: #0cacd7;
 }
 
 .btn.active {
-  background: #008000;
-  border-color: #008000;
+  background: #0cacd7;
+  border-color: #0cacd7;
   color: #fff;
 }
 </style>

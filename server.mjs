@@ -21,6 +21,7 @@ const MIME = {
   '.json': 'application/json',
 }
 
+
 async function handleBandcamp(url, res) {
   const artist = url.searchParams.get('artist')?.trim()
   if (!artist) {
@@ -43,32 +44,40 @@ async function handleBandcamp(url, res) {
     }
     const html = await response.text()
     const root = parseHtml(html)
-    const musicGrid = root.querySelector('[data-client-items]')
-    let albums = []
 
-    if (musicGrid) {
-      try {
-        const items = JSON.parse(musicGrid.getAttribute('data-client-items') ?? '[]')
-        albums = items
-          .filter(item => item.item_type === 'album' || item.item_type === 'track')
-          .map(item => ({
-            id: String(item.id ?? item.page_url),
-            title: item.title ?? 'Unknown',
-            imageUrl: item.art_id ? `https://f4.bcbits.com/img/a${item.art_id}_10.jpg` : null,
-            releaseDate: item.publish_date ?? null,
-            url: item.page_url ? `https://${artist}.bandcamp.com${item.page_url}` : null,
-          }))
-          .filter(a => a.imageUrl)
-      } catch { /* fall through */ }
+    const bandEl = root.querySelector('[data-band]')
+    const bandData = JSON.parse(bandEl?.getAttribute('data-band') ?? '{}')
+    const bandId = String(bandData.id ?? '')
+    const albums = []
+
+    if (bandId) {
+      const apiUrl = `https://${encodeURIComponent(artist)}.bandcamp.com/api/mobile/22/band_details?band_id=${bandId}`
+      const apiRes = await fetch(apiUrl, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
+      })
+      if (apiRes.ok) {
+        const apiData = await apiRes.json()
+        for (const item of apiData.discography ?? []) {
+          if (item.art_id) {
+            albums.push({
+              id: String(item.id ?? albums.length),
+              title: item.title ?? 'Unknown',
+              imageUrl: `https://f4.bcbits.com/img/a${item.art_id}_10.jpg`,
+              releaseDate: null,
+              url: item.url ?? null,
+            })
+          }
+        }
+      }
     }
 
     if (albums.length === 0) {
-      const items = root.querySelectorAll('li.music-grid-item, li[data-item-id]')
+      const items = root.querySelectorAll('ol.music-grid li, li.music-grid-item')
       for (const item of items) {
         const img = item.querySelector('img')
-        const titleEl = item.querySelector('.title, p.title, .grid-title')
+        const titleEl = item.querySelector('p.title, .title')
         const link = item.querySelector('a')
-        const src = img?.getAttribute('data-src') ?? img?.getAttribute('src') ?? ''
+        const src = img?.getAttribute('data-original') ?? img?.getAttribute('data-src') ?? img?.getAttribute('src') ?? ''
         const imageUrl = src.replace(/_\d+\.jpg$/, '_10.jpg')
         if (imageUrl && imageUrl.includes('bcbits.com')) {
           albums.push({
