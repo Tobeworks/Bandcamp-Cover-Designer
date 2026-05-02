@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      node-html-parser:
+        specifier: ^6.1.0
+        version: 6.1.13
       vue:
         specifier: ^3.4.0
         version: 3.5.33(typescript@5.9.3)
@@ -18,9 +21,6 @@ importers:
       '@vitejs/plugin-vue':
         specifier: ^5.0.0
         version: 5.2.4(vite@5.4.21)(vue@3.5.33(typescript@5.9.3))
-      node-html-parser:
-        specifier: ^6.1.0
-        version: 6.1.13
       typescript:
         specifier: ^5.4.0
         version: 5.9.3
