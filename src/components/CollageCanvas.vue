@@ -20,6 +20,11 @@
       </div>
     </div>
 
+    <!-- Branding overlay — mirrors canvas export -->
+    <div v-if="showBranding && artistName" class="branding-bar" aria-hidden="true">
+      <span class="branding-name">{{ artistName.toUpperCase() }}</span>
+    </div>
+
     <canvas ref="canvasRef" class="hidden-canvas" :width="canvasW" :height="canvasH" />
   </div>
 </template>
@@ -233,6 +238,28 @@ defineExpose({ renderToCanvas })
   letter-spacing: 0.08em;
   text-transform: uppercase;
   line-height: 1.3;
+}
+
+.branding-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 52px;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 0 12px 10px;
+  pointer-events: none;
+}
+
+.branding-name {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.18em;
 }
 
 .hidden-canvas {

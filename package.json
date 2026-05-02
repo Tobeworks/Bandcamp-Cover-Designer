@@ -1,7 +1,7 @@
 {
   "name": "bandcamp-cover-designer",
   "private": true,
-  "version": "0.1.0@alpha",
+  "version": "1.0.0@alpha",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,7 +13,8 @@
     "@tailwindcss/vite": "^4.2.4",
     "node-html-parser": "^6.1.0",
     "tailwindcss": "^4.2.4",
-    "vue": "^3.4.0"
+    "vue": "^3.4.0",
+    "vue-router": "^5.0.6"
   },
   "devDependencies": {
     "@playwright/test": "^1.44.0",
