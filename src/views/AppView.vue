@@ -158,9 +158,7 @@
         <!-- Empty state -->
         <div v-else class="flex flex-col items-center gap-4 text-center max-w-xs">
           <div class="w-16 h-16 rounded-full bg-[#d0dde0] flex items-center justify-center" aria-hidden="true">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#5d5d5d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
-            </svg>
+            <LayoutGrid :size="28" stroke="#5d5d5d" :stroke-width="1.5" />
           </div>
           <div>
             <p class="text-sm font-medium text-[#222]">No collage yet</p>
@@ -199,6 +197,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import { LayoutGrid } from 'lucide-vue-next'
 import { useRoute, useRouter } from 'vue-router'
 import { version } from '../../package.json'
 import CollageCanvas from '../components/CollageCanvas.vue'

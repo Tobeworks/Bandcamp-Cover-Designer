@@ -13,9 +13,7 @@
         ? 'h-12 rounded-l-sm'
         : 'h-10 rounded-l-[3px] bg-[#22222215] border-[#22222280]'"
     >
-      <svg v-if="hero" class="shrink-0 ml-3 text-[#aaa]" aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-      </svg>
+      <Search v-if="hero" :size="15" class="shrink-0 ml-3 text-[#aaa]" aria-hidden="true" />
       <input
         v-model="value"
         type="text"
@@ -50,6 +48,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { Search } from 'lucide-vue-next'
 
 const { loading, hero = false } = defineProps<{ loading: boolean; hero?: boolean }>()
 const emit = defineEmits<{ submit: [artist: string] }>()

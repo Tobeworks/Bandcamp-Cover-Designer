@@ -8,13 +8,6 @@
   --color-muted: #5d5d5d;
   --font-mono: 'Space Mono', monospace;
 }
-
-/* Focus ring */
-:focus-visible {
-  outline: 2px solid var(--color-bc);
-  outline-offset: 2px;
-}
-
 /* Skip link */
 .skip-link {
   position: absolute;
