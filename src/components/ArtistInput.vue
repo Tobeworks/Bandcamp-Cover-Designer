@@ -8,12 +8,12 @@
   >
     <!-- Input wrapper -->
     <div
-      class="flex items-center flex-1 bg-white border border-r-0 border-[#22222229] overflow-hidden"
+      class="flex items-center flex-1 bg-white border border-r-0 border-ink/16 overflow-hidden"
       :class="hero
         ? 'h-12 rounded-l-sm'
-        : 'h-10 rounded-l-[3px] bg-[#22222215] border-[#22222280]'"
+        : 'h-10 rounded-l-[3px] bg-ink/8 border-ink/50'"
     >
-      <Search v-if="hero" :size="15" class="shrink-0 ml-3 text-[#aaa]" aria-hidden="true" />
+      <Search v-if="hero" :size="15" class="shrink-0 ml-3 text-subtle" aria-hidden="true" />
       <input
         v-model="value"
         type="text"
@@ -22,18 +22,18 @@
         spellcheck="false"
         :disabled="loading"
         :aria-label="hero ? 'Bandcamp artist name or URL' : 'Artist name'"
-        class="flex-1 min-w-0 bg-transparent border-none outline-none text-sm text-[#222] placeholder:text-[#aaa] disabled:opacity-50"
+        class="flex-1 min-w-0 bg-transparent border-none outline-none text-sm text-ink placeholder:text-subtle disabled:opacity-50"
         :class="hero ? 'px-3 font-sans' : 'px-3 font-mono'"
         data-testid="artist-input"
       />
-      <span v-if="!hero" class="pr-3 text-xs text-[#22222250] font-mono whitespace-nowrap select-none" aria-hidden="true">.bandcamp.com</span>
+      <span v-if="!hero" class="pr-3 text-xs text-ink/31 font-mono whitespace-nowrap select-none" aria-hidden="true">.bandcamp.com</span>
     </div>
 
     <!-- Submit button -->
     <button
       type="submit"
       :disabled="loading || !value.trim()"
-      class="flex items-center justify-center gap-2 bg-[#0cacd7] text-white border-none cursor-pointer font-medium transition-colors hover:bg-[#0a9bbf] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+      class="flex items-center justify-center gap-2 bg-primary text-white border-none cursor-pointer font-medium transition-colors hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
       :class="hero
         ? 'h-12 px-6 rounded-r-sm text-sm'
         : 'h-10 px-5 rounded-r-[3px] text-sm font-mono font-bold tracking-wide'"

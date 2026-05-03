@@ -1,6 +1,6 @@
 <template>
   <button
-    class="flex items-center gap-2 px-4 py-1.5 bg-[#222] text-white border border-white/10 rounded-sm text-xs font-mono tracking-wide cursor-pointer transition-colors hover:bg-[#333] disabled:opacity-40 disabled:cursor-not-allowed"
+    class="flex items-center gap-2 px-4 py-1.5 bg-ink text-white border border-white/10 rounded-sm text-xs font-mono tracking-wide cursor-pointer transition-colors hover:bg-ink/80 disabled:opacity-40 disabled:cursor-not-allowed"
     :disabled="disabled || downloading"
     :aria-label="downloading ? 'Generating PNG…' : 'Download 1080×1080 PNG'"
     data-testid="download-btn"

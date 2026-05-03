@@ -5,7 +5,7 @@
         v-for="(album, i) in visibleAlbums"
         :key="album.id + i"
         class="cell"
-        :class="{ 'cell--large': layout === 'mosaic' && i === 0 }"
+        :class="bentoCellClass(i)"
       >
         <img
           :src="album.imageUrl"
@@ -47,7 +47,7 @@ const GAP = 3
 
 const canvasW = computed(() => CANVAS_SIZE)
 const canvasH = computed(() => {
-  if (props.layout === 'mosaic') return CANVAS_SIZE
+  if (props.layout === 'bento') return CANVAS_SIZE
   const { cols, rows } = currentLayout.value
   return Math.round(CANVAS_SIZE * rows / cols)
 })
@@ -66,11 +66,11 @@ const visibleAlbums = computed(() => {
 })
 
 const gridStyle = computed(() => {
-  if (props.layout === 'mosaic') {
+  if (props.layout === 'bento') {
     return {
       display: 'grid',
-      gridTemplateColumns: '2fr 1fr',
-      gridTemplateRows: 'repeat(4, 1fr)',
+      gridTemplateColumns: 'repeat(3, 1fr)',
+      gridTemplateRows: 'repeat(3, 1fr)',
       gap: `${GAP}px`,
     }
   }
@@ -81,6 +81,13 @@ const gridStyle = computed(() => {
     gap: `${GAP}px`,
   }
 })
+
+function bentoCellClass(i: number): string {
+  if (props.layout !== 'bento') return ''
+  if (i === 0) return 'bento--main'
+  if (i === 1) return 'bento--side'
+  return ''
+}
 
 function onImgError(event: Event, album: Album) {
   const img = event.target as HTMLImageElement
@@ -118,17 +125,18 @@ async function renderToCanvas(): Promise<Blob> {
 
   const images = await Promise.allSettled(albums.map(a => loadImage(a.imageUrl)))
 
-  if (props.layout === 'mosaic') {
-    const largeW = Math.floor((W - gap) * 2 / 3)
-    const smallW = W - largeW - gap
-    const smallH = Math.floor((H - gap * 3) / 4)
-    if (images[0]?.status === 'fulfilled') {
-      drawCover(ctx, images[0].value, 0, 0, largeW, H)
-    }
-    for (let i = 1; i < Math.min(albums.length, 5); i++) {
+  if (props.layout === 'bento') {
+    // 3×3 grid: item 0 = 2×2 top-left, item 1 = 1×2 top-right, items 2–4 = 1×1 bottom row
+    const cell = Math.floor((W - gap * 2) / 3)
+    const largeW = cell * 2 + gap
+    const largeH = cell * 2 + gap
+    const smallH = W - largeH - gap
+    if (images[0]?.status === 'fulfilled') drawCover(ctx, images[0].value, 0, 0, largeW, largeH)
+    if (images[1]?.status === 'fulfilled') drawCover(ctx, images[1].value, largeW + gap, 0, cell, largeH)
+    for (let i = 2; i < 5; i++) {
       const img = images[i]
       if (img?.status === 'fulfilled') {
-        drawCover(ctx, img.value, largeW + gap, (i - 1) * (smallH + gap), smallW, smallH)
+        drawCover(ctx, img.value, (i - 2) * (cell + gap), largeH + gap, cell, smallH)
       }
     }
   } else {
@@ -197,9 +205,14 @@ defineExpose({ renderToCanvas })
   background: #111;
 }
 
-.cell--large {
-  grid-column: 1;
-  grid-row: 1 / span 4;
+.bento--main {
+  grid-column: 1 / span 2;
+  grid-row: 1 / span 2;
+}
+
+.bento--side {
+  grid-column: 3;
+  grid-row: 1 / span 2;
 }
 
 .cover {

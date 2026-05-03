@@ -5,8 +5,8 @@
       :key="layout.mode"
       class="px-3 py-1.5 border rounded-sm text-xs font-mono cursor-pointer transition-all"
       :class="modelValue === layout.mode
-        ? 'bg-[#0cacd7] border-[#0cacd7] text-white'
-        : 'bg-transparent border-[#22222230] text-[#222] hover:border-[#0cacd7] hover:text-[#0cacd7]'"
+        ? 'bg-primary border-primary text-white'
+        : 'bg-transparent border-ink/19 text-ink hover:border-primary hover:text-primary'"
       :aria-pressed="modelValue === layout.mode"
       :aria-label="`${layout.label} layout`"
       :data-testid="`layout-${layout.mode}`"
