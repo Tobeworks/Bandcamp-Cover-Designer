@@ -9,10 +9,9 @@ export function useBandcamp() {
   const artistName = ref('')
 
   function clampLayout(current: LayoutMode, count: number): LayoutMode {
-    const available = LAYOUTS.filter(l => l.mode === 'mosaic' || l.count <= count)
+    const available = LAYOUTS.filter(l => l.count <= count)
     if (available.find(l => l.mode === current)) return current
-    const nonMosaic = available.filter(l => l.mode !== 'mosaic')
-    return nonMosaic[nonMosaic.length - 1]?.mode ?? '1x1'
+    return available[available.length - 1]?.mode ?? '1x1'
   }
 
   async function fetchAlbums(artist: string, currentLayout?: LayoutMode): Promise<LayoutMode | null> {

@@ -26,6 +26,6 @@ const props = defineProps<{ modelValue: LayoutMode; albumCount: number }>()
 const emit = defineEmits<{ 'update:modelValue': [mode: LayoutMode] }>()
 
 const availableLayouts = computed(() =>
-  LAYOUTS.filter(l => l.mode === 'mosaic' || l.count <= props.albumCount)
+  LAYOUTS.filter(l => l.count <= props.albumCount)
 )
 </script>
