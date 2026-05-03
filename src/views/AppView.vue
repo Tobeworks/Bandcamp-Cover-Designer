@@ -73,6 +73,29 @@
       <div class="px-5 py-4 flex flex-col gap-3 border-b border-edge">
         <span class="text-[10px] font-semibold tracking-widest text-subtle uppercase">Options</span>
 
+        <div class="flex flex-col gap-1.5">
+          <span class="text-sm text-ink">Background</span>
+          <div class="flex items-center gap-2">
+            <div class="flex gap-1">
+              <button
+                v-for="preset in bgPresets"
+                :key="preset"
+                class="w-5 h-5 rounded-sm border-2 transition-colors"
+                :style="{ background: preset }"
+                :class="bgColor === preset ? 'border-primary' : 'border-transparent'"
+                :aria-label="`Set background to ${preset}`"
+                @click="bgColor = preset"
+              />
+            </div>
+            <input
+              v-model="bgColor"
+              type="color"
+              class="w-7 h-7 rounded-sm border border-edge cursor-pointer p-0.5 bg-white"
+              aria-label="Custom background color"
+            />
+          </div>
+        </div>
+
         <div class="flex items-center justify-between">
           <span class="text-sm text-ink">Branding overlay</span>
           <button
@@ -85,6 +108,22 @@
           >
             <span class="absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-all" :class="showBranding ? 'left-[18px]' : 'left-0.5'" />
           </button>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-ink">Gap</span>
+            <span class="text-xs font-mono text-muted w-6 text-right">{{ gap }}px</span>
+          </div>
+          <input
+            v-model.number="gap"
+            type="range"
+            min="0"
+            max="16"
+            step="1"
+            class="w-full accent-primary"
+            aria-label="Gap between covers"
+          />
         </div>
 
         <div class="flex items-center justify-between">
@@ -144,6 +183,8 @@
           :layout="layout"
           :artistName="artistName"
           :showBranding="showBranding"
+          :gap="gap"
+          :bgColor="bgColor"
         />
 
         <!-- Loading -->
@@ -212,6 +253,10 @@ const LS_LAYOUT = 'bc-last-layout'
 const artistInput = ref('')
 const layout = ref<LayoutMode>((localStorage.getItem(LS_LAYOUT) as LayoutMode) ?? '3x3')
 const showBranding = ref(true)
+const gap = ref(3)
+const bgColor = ref('#0a0a0f')
+
+const bgPresets = ['#0a0a0f', '#ffffff', '#1a1a2e', '#2d2d2d', '#0f3460', '#1b4332']
 const downloading = ref(false)
 const collageRef = ref<InstanceType<typeof CollageCanvas> | null>(null)
 

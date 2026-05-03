@@ -1,6 +1,6 @@
 <template>
   <div class="collage-wrap">
-    <div class="collage" :class="`layout-${layout}`" :style="gridStyle" data-testid="collage">
+    <div class="collage" :class="`layout-${layout}`" :style="collageStyle" data-testid="collage">
       <div
         v-for="(album, i) in visibleAlbums"
         :key="album.id + i"
@@ -39,11 +39,13 @@ const props = defineProps<{
   layout: LayoutMode
   artistName: string
   showBranding: boolean
+  gap?: number
+  bgColor?: string
 }>()
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const CANVAS_SIZE = 1080
-const GAP = 3
+const GAP = computed(() => props.gap ?? 3)
 
 const canvasW = computed(() => CANVAS_SIZE)
 const canvasH = computed(() => {
@@ -65,21 +67,20 @@ const visibleAlbums = computed(() => {
   return result
 })
 
-const gridStyle = computed(() => {
-  if (props.layout === 'bento') {
-    return {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(3, 1fr)',
-      gridTemplateRows: 'repeat(3, 1fr)',
-      gap: `${GAP}px`,
-    }
-  }
-  const cols = currentLayout.value.cols
-  return {
-    display: 'grid',
-    gridTemplateColumns: `repeat(${cols}, 1fr)`,
-    gap: `${GAP}px`,
-  }
+const collageStyle = computed(() => {
+  const grid = props.layout === 'bento'
+    ? {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gridTemplateRows: 'repeat(3, 1fr)',
+        gap: `${GAP.value}px`,
+      }
+    : {
+        display: 'grid',
+        gridTemplateColumns: `repeat(${currentLayout.value.cols}, 1fr)`,
+        gap: `${GAP.value}px`,
+      }
+  return { ...grid, background: props.bgColor ?? '#0a0a0f' }
 })
 
 function bentoCellClass(i: number): string {
@@ -102,11 +103,11 @@ async function renderToCanvas(): Promise<Blob> {
   const ctx = canvas.getContext('2d')!
   const W = canvasW.value
   const H = canvasH.value
-  ctx.fillStyle = '#0a0a0f'
+  ctx.fillStyle = props.bgColor ?? '#0a0a0f'
   ctx.fillRect(0, 0, W, H)
 
   const albums = visibleAlbums.value
-  const gap = GAP
+  const gap = GAP.value
 
   const proxied = (src: string) => `/api/image?url=${encodeURIComponent(src)}`
 
@@ -195,7 +196,6 @@ defineExpose({ renderToCanvas })
 .collage {
   width: 100%;
   height: 100%;
-  background: #0a0a0f;
   overflow: hidden;
 }
 
