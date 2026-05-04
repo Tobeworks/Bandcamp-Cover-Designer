@@ -1,15 +1,18 @@
 # Bandcamp Cover Designer
 
-Generate Instagram-ready cover collages from any Bandcamp artist — pick a layout, export a 1080×1080 PNG.
+Generate Instagram-ready cover collages from any Bandcamp artist — pick a layout, tweak the gap and background color, export a 1080×1080 PNG.
 
 ## Features
 
 - Enter any Bandcamp artist name or URL (`logicmoon`, `logicmoon.bandcamp.com`, or the full URL)
-- 8 layout options from 1×1 to 5×5 plus a Mosaic mode
+- 8 layout options from 1×1 to 5×5 plus a Bento mode
+- Adjustable gap between covers (0–16 px)
+- Custom background color with presets
 - Shuffle release order
 - Artist branding overlay toggle
-- One-click 1080×1080 PNG export
+- One-click 1080×1080 PNG export with timestamp in filename
 - Layouts are only offered when enough releases are available
+- URL params: `/app?artist=portishead` — shareable and bookmarkable
 
 ## Getting Started
 
@@ -24,16 +27,18 @@ Open [http://localhost:5173](http://localhost:5173).
 
 ## Available Layouts
 
-| Mode   | Grid | Albums needed |
-|--------|------|---------------|
-| 1×1    | 1×1  | 1             |
-| 2×2    | 2×2  | 4             |
-| 2×3    | 2×3  | 6             |
-| 3×2    | 3×2  | 6             |
-| 3×3    | 3×3  | 9             |
-| 4×4    | 4×4  | 16            |
-| 5×5    | 5×5  | 25            |
-| Mosaic | custom | 9           |
+| Mode  | Grid | Albums needed |
+|-------|------|---------------|
+| 1×1   | 1×1  | 1             |
+| 2×2   | 2×2  | 4             |
+| 2×3   | 2×3  | 6             |
+| 3×2   | 3×2  | 6             |
+| 3×3   | 3×3  | 9             |
+| 4×4   | 4×4  | 16            |
+| 5×5   | 5×5  | 25            |
+| Bento | asymmetric 3×3 | 5   |
+
+The Bento layout places one large 2×2 image top-left, one tall 1×2 image top-right, and three equal cells across the bottom.
 
 ## Production Build
 
@@ -66,14 +71,11 @@ Playwright E2E tests in `tests/collage.spec.ts`.
 ## Tech Stack
 
 - [Vue 3](https://vuejs.org) (Composition API) + [Vite](https://vitejs.dev) + TypeScript
+- Tailwind CSS v4 with semantic design tokens
 - [node-html-parser](https://github.com/taoqf/node-html-parser) — Bandcamp HTML scraping
 - Native Canvas API — collage rendering + PNG export
 - pnpm · Playwright · Docker · GHCR · ArgoCD
 
-## Version
-
-`0.1.0@alpha`
-
 ---
 
-Built by [tobeworks.de](https://tobeworks.de) · [Impressum](https://tobeworks.de/impressum) · [Datenschutz](https://tobeworks.de/datenschutz)
+Built by [tobeworks.de](https://tobeworks.de) · [GitHub](https://github.com/tobeworks/bandcamp-cover-designer) · [Impressum](https://tobeworks.de/impressum) · [Datenschutz](https://tobeworks.de/datenschutz)
