@@ -8,7 +8,7 @@
   >
     <!-- Input wrapper -->
     <div
-      class="flex items-center flex-1 bg-white border border-r-0 border-ink/16 overflow-hidden"
+      class="flex items-center flex-1 bg-card border border-r-0 border-ink/16 overflow-hidden"
       :class="hero
         ? 'h-12 rounded-l-sm'
         : 'h-10 rounded-l-[3px] bg-ink/8 border-ink/50'"

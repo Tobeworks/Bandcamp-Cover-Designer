@@ -2,18 +2,28 @@
   <div class="min-h-screen flex flex-col bg-surface">
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <header class="bg-ink border-b-2 border-primary" role="banner">
+    <header class="bg-header border-b-2 border-primary" role="banner">
       <div class="max-w-5xl mx-auto px-6 h-[53px] flex items-center justify-between">
         <div class="flex items-center gap-3" aria-label="Bandcamp Cover Designer">
           <span class="bg-primary text-white font-mono font-bold text-base px-2 py-0.5 rounded-sm tracking-tight" aria-hidden="true">bc</span>
           <span class="text-white text-sm tracking-widest uppercase font-mono">Cover Designer</span>
         </div>
-        <RouterLink
-          to="/app"
-          class="h-8 px-4 bg-primary text-white text-sm font-mono font-bold rounded-sm flex items-center gap-1.5 transition-colors hover:bg-primary-hover no-underline"
-        >
-          Open Designer →
-        </RouterLink>
+        <div class="flex items-center gap-2">
+          <button
+            class="w-8 h-8 flex items-center justify-center rounded-sm text-white/70 hover:text-white transition-colors"
+            :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+            @click="toggle"
+          >
+            <Sun v-if="isDark" :size="16" />
+            <Moon v-else :size="16" />
+          </button>
+          <RouterLink
+            to="/app"
+            class="h-8 px-4 bg-primary text-white text-sm font-mono font-bold rounded-sm flex items-center gap-1.5 transition-colors hover:bg-primary-hover no-underline"
+          >
+            Open Designer →
+          </RouterLink>
+        </div>
       </div>
     </header>
 
@@ -34,7 +44,7 @@
 
       <!-- Input -->
       <form class="flex w-full max-w-xl" role="search" aria-label="Search Bandcamp artist" @submit.prevent="handleSubmit">
-        <div class="flex items-center flex-1 h-12 bg-white border-0 border-ink/16 overflow-hidden focus:ring-0">
+        <div class="flex items-center flex-1 h-12 bg-card border-0 border-ink/16 overflow-hidden focus:ring-0">
           <Search :size="15" class="shrink-0 ml-3 text-subtle" aria-hidden="true" />
           <input
             v-model="artistInput"
@@ -99,9 +109,12 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Search } from 'lucide-vue-next'
+import { Search, Moon, Sun } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import { version } from '../../package.json'
+import { useDarkMode } from '../composables/useDarkMode'
+
+const { isDark, toggle } = useDarkMode()
 
 const router = useRouter()
 const artistInput = ref('')

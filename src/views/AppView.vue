@@ -3,7 +3,7 @@
     <a href="#preview" class="skip-link">Skip to preview</a>
 
     <!-- ── Sidebar ── -->
-    <aside class="w-full lg:w-[280px] lg:flex-shrink-0 flex flex-col bg-white border-b lg:border-b-0 lg:border-r border-edge overflow-y-auto" aria-label="Controls">
+    <aside class="w-full lg:w-[280px] lg:flex-shrink-0 flex flex-col bg-card border-b lg:border-b-0 lg:border-r border-edge overflow-y-auto" aria-label="Controls">
 
       <!-- Logo + back -->
       <div class="px-5 py-4 flex items-center justify-between border-b border-edge">
@@ -14,9 +14,19 @@
             <div class="text-[10px] text-subtle leading-tight">by The Moon</div>
           </div>
         </div>
-        <RouterLink to="/" class="text-[10px] text-subtle hover:text-primary transition-colors no-underline" aria-label="Back to home">
-          ← Home
-        </RouterLink>
+        <div class="flex items-center gap-2">
+          <button
+            class="w-6 h-6 flex items-center justify-center rounded-sm text-subtle hover:text-primary transition-colors"
+            :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+            @click="toggle"
+          >
+            <Sun v-if="isDark" :size="13" />
+            <Moon v-else :size="13" />
+          </button>
+          <RouterLink to="/" class="text-[10px] text-subtle hover:text-primary transition-colors no-underline" aria-label="Back to home">
+            ← Home
+          </RouterLink>
+        </div>
       </div>
 
       <!-- Artist -->
@@ -31,7 +41,7 @@
           spellcheck="false"
           :disabled="loading"
           aria-label="Bandcamp artist name or URL"
-          class="w-full h-9 px-3 text-sm text-ink bg-white border border-edge rounded-sm placeholder:text-subtle disabled:opacity-50 focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary"
+          class="w-full h-9 px-3 text-sm text-ink bg-card border border-edge rounded-sm placeholder:text-subtle disabled:opacity-50 focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary"
           data-testid="artist-input"
           @keydown.enter="handleLoad"
         />
@@ -58,7 +68,7 @@
             class="h-8 text-xs rounded-sm border transition-all font-mono"
             :class="layout === l.mode
               ? 'bg-primary border-primary text-white'
-              : 'bg-white border-edge text-ink hover:border-primary hover:text-primary'"
+              : 'bg-card border-edge text-ink hover:border-primary hover:text-primary'"
             :aria-pressed="layout === l.mode"
             :aria-label="`${l.label} layout`"
             :data-testid="`layout-${l.mode}`"
@@ -90,7 +100,7 @@
             <input
               v-model="bgColor"
               type="color"
-              class="w-7 h-7 rounded-sm border border-edge cursor-pointer p-0.5 bg-white"
+              class="w-7 h-7 rounded-sm border border-edge cursor-pointer p-0.5 bg-card"
               aria-label="Custom background color"
             />
           </div>
@@ -106,7 +116,7 @@
             aria-label="Toggle branding overlay"
             @click="showBranding = !showBranding"
           >
-            <span class="absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-all" :class="showBranding ? 'left-[18px]' : 'left-0.5'" />
+            <span class="absolute top-0.5 w-4 h-4 bg-card rounded-full shadow-sm transition-all" :class="showBranding ? 'left-[18px]' : 'left-0.5'" />
           </button>
         </div>
 
@@ -179,7 +189,7 @@
     <div id="preview" class="flex-1 flex flex-col min-h-0 overflow-hidden" role="main">
 
       <!-- Topbar -->
-      <div class="h-10 flex-shrink-0 bg-white border-b border-edge flex items-center justify-between px-5">
+      <div class="h-10 flex-shrink-0 bg-card border-b border-edge flex items-center justify-between px-5">
         <span class="text-xs font-semibold text-muted">Preview</span>
         <div v-if="albums.length" class="flex items-center gap-1.5 text-xs text-muted">
           <span class="w-1.5 h-1.5 rounded-full bg-primary" aria-hidden="true" />
@@ -217,14 +227,14 @@
             <p class="text-xs text-muted mt-1">Enter a Bandcamp artist name and click <strong>Load Releases</strong></p>
           </div>
           <div class="text-xs text-subtle">
-            e.g. <code class="bg-white px-1.5 py-0.5 rounded border border-edge">logicmoon</code>
-            · <code class="bg-white px-1.5 py-0.5 rounded border border-edge">ninjatune</code>
+            e.g. <code class="bg-card px-1.5 py-0.5 rounded border border-edge">logicmoon</code>
+            · <code class="bg-card px-1.5 py-0.5 rounded border border-edge">ninjatune</code>
           </div>
         </div>
       </div>
 
       <!-- Bottombar -->
-      <div class="h-10 flex-shrink-0 bg-white border-t border-edge flex items-center justify-between px-5">
+      <div class="h-10 flex-shrink-0 bg-card border-t border-edge flex items-center justify-between px-5">
         <span class="text-xs text-muted">Output: 1080 × 1080 px · Format: PNG</span>
         <div v-if="albums.length" class="flex items-center gap-3">
           <span class="flex items-center gap-1 text-xs text-muted">
@@ -249,12 +259,15 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import { LayoutGrid } from 'lucide-vue-next'
+import { LayoutGrid, Moon, Sun } from 'lucide-vue-next'
 import { useRoute, useRouter } from 'vue-router'
 import { version } from '../../package.json'
 import CollageCanvas from '../components/CollageCanvas.vue'
 import { useBandcamp } from '../composables/useBandcamp'
+import { useDarkMode } from '../composables/useDarkMode'
 import { LAYOUTS } from '../types'
+
+const { isDark, toggle } = useDarkMode()
 import type { LayoutMode } from '../types'
 
 const route = useRoute()
