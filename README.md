@@ -12,6 +12,7 @@ Generate Instagram-ready cover collages from any Bandcamp artist — pick a layo
 - Artist branding overlay toggle
 - One-click 1080×1080 PNG export with timestamp in filename
 - Layouts are only offered when enough releases are available
+- Release filter — toggle individual covers in/out of the collage via a slide-in panel (desktop) or bottom sheet (mobile)
 - URL params: `/app?artist=portishead` — shareable and bookmarkable
 
 ## Getting Started

@@ -186,14 +186,26 @@
     </aside>
 
     <!-- ── Preview Panel ── -->
-    <div id="preview" class="flex-1 flex flex-col min-h-0 overflow-hidden" role="main">
+    <div id="preview" class="flex-1 flex flex-col min-h-0 overflow-hidden relative" role="main">
 
       <!-- Topbar -->
       <div class="h-10 flex-shrink-0 bg-card border-b border-edge flex items-center justify-between px-5">
         <span class="text-xs font-semibold text-muted">Preview</span>
-        <div v-if="albums.length" class="flex items-center gap-1.5 text-xs text-muted">
-          <span class="w-1.5 h-1.5 rounded-full bg-primary" aria-hidden="true" />
-          <span aria-live="polite">{{ albums.length }} releases found · showing {{ currentLayout.count }}</span>
+        <div v-if="albums.length" class="flex items-center gap-2">
+          <span class="text-xs text-muted" aria-live="polite">
+            {{ filteredAlbums.length }}/{{ albums.length }} releases · showing {{ currentLayout.count }}
+          </span>
+          <button
+            class="flex items-center gap-1 text-xs px-2 h-6 rounded-sm border transition-colors"
+            :class="filterOpen
+              ? 'bg-primary border-primary text-white'
+              : 'border-edge text-muted hover:border-primary hover:text-primary'"
+            :aria-label="filterOpen ? 'Filter schließen' : 'Releases filtern'"
+            @click="filterOpen = !filterOpen"
+          >
+            <SlidersHorizontal :size="12" />
+            Filter
+          </button>
         </div>
       </div>
 
@@ -201,9 +213,9 @@
       <div class="flex-1 overflow-auto flex items-center justify-center p-6">
 
         <CollageCanvas
-          v-if="albums.length"
+          v-if="filteredAlbums.length"
           ref="collageRef"
-          :albums="albums"
+          :albums="filteredAlbums"
           :layout="layout"
           :artistName="artistName"
           :showBranding="showBranding"
@@ -233,10 +245,20 @@
         </div>
       </div>
 
+      <!-- Release Filter Drawer/Modal -->
+      <ReleaseFilter
+        :albums="albums"
+        :excludedIds="excludedIds"
+        :open="filterOpen"
+        @toggle="toggleExclude"
+        @reset="resetExcluded"
+        @close="filterOpen = false"
+      />
+
       <!-- Bottombar -->
       <div class="h-10 flex-shrink-0 bg-card border-t border-edge flex items-center justify-between px-5">
         <span class="text-xs text-muted">Output: 1080 × 1080 px · Format: PNG</span>
-        <div v-if="albums.length" class="flex items-center gap-3">
+        <div v-if="filteredAlbums.length" class="flex items-center gap-3">
           <span class="flex items-center gap-1 text-xs text-muted">
             <span class="w-1.5 h-1.5 rounded-full" :class="showBranding ? 'bg-primary' : 'bg-edge'" aria-hidden="true" />
             Branding {{ showBranding ? 'ON' : 'OFF' }}
@@ -259,16 +281,17 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import { LayoutGrid, Moon, Sun } from 'lucide-vue-next'
+import { LayoutGrid, Moon, Sun, SlidersHorizontal } from 'lucide-vue-next'
 import { useRoute, useRouter } from 'vue-router'
 import { version } from '../../package.json'
 import CollageCanvas from '../components/CollageCanvas.vue'
+import ReleaseFilter from '../components/ReleaseFilter.vue'
 import { useBandcamp } from '../composables/useBandcamp'
 import { useDarkMode } from '../composables/useDarkMode'
 import { LAYOUTS } from '../types'
+import type { LayoutMode } from '../types'
 
 const { isDark, toggle } = useDarkMode()
-import type { LayoutMode } from '../types'
 
 const route = useRoute()
 const router = useRouter()
@@ -285,12 +308,27 @@ const bgColor = ref('#0a0a0f')
 
 const bgPresets = ['#0a0a0f', '#ffffff', '#1a1a2e', '#2d2d2d', '#0f3460', '#1b4332']
 const downloading = ref(false)
+const filterOpen = ref(false)
+const excludedIds = ref<Set<string>>(new Set())
 const collageRef = ref<InstanceType<typeof CollageCanvas> | null>(null)
 
 const currentLayout = computed(() => LAYOUTS.find(l => l.mode === layout.value)!)
-const availableLayouts = computed(() =>
-  LAYOUTS.filter(l => !albums.value.length || l.count <= albums.value.length)
+const filteredAlbums = computed(() =>
+  albums.value.filter(a => !excludedIds.value.has(a.id))
 )
+const availableLayouts = computed(() =>
+  LAYOUTS.filter(l => !filteredAlbums.value.length || l.count <= filteredAlbums.value.length)
+)
+
+function toggleExclude(id: string) {
+  const s = new Set(excludedIds.value)
+  s.has(id) ? s.delete(id) : s.add(id)
+  excludedIds.value = s
+}
+
+function resetExcluded() {
+  excludedIds.value = new Set()
+}
 
 function parseArtist(input: string): string {
   let s = input.trim()
@@ -305,6 +343,8 @@ async function handleLoad() {
   if (!artist) return
   localStorage.setItem(LS_ARTIST, artist)
   router.replace({ path: '/app', query: { artist } })
+  excludedIds.value = new Set()
+  filterOpen.value = false
   const clamped = await fetchAlbums(artist, layout.value)
   if (clamped) setLayout(clamped)
 }
